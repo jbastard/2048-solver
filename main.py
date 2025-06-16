@@ -1,5 +1,4 @@
 import random
-
 import pygame
 
 TILE_SIZE       = 200
@@ -17,10 +16,10 @@ class   Tile:
         self.text = None
 
     def draw(self, screen):
-        pygame.draw.rect(screen, (0, 0, 0), self.rect, 2)  # bordure
+        pygame.draw.rect(screen, (0, 0, 255), self.rect, 16)
+        self.text = font.render(f"{self.value}", True, (255, 0, 0))
+        text_rect = self.text.get_rect(center=self.rect.center)
         if self.value != 0:
-            self.text = font.render(f"{self.value}", True, (255, 0, 255))
-            text_rect = self.text.get_rect(center=self.rect.center)
             screen.blit(self.text, text_rect)
 
 
@@ -41,10 +40,22 @@ def     temp_grid(width, height):
 
 def     start_game():
     random.seed()
-    r1 = random.randrange(4)
-    r2 = random.randrange(4)
-    game.tiles[random.randrange(4)][random.randrange(4)].value = random.randrange(2, 5, 2)
-    game.tiles[random.randrange(4)][random.randrange(4)].value = random.randrange(2, 5, 2)
+    score = (2, 2, 2, 2, 2, 2, 2, 2, 2, 4)
+    r1 = pygame.Vector2(random.randrange(4), random.randrange(4))
+    r2 = pygame.Vector2(random.randrange(4), random.randrange(4))
+    while r1 == r2:
+        r2 = pygame.Vector2(random.randrange(4), random.randrange(4))
+    game.tiles[int(r1.x)][int(r1.y)].value = score[int(random.randrange(10))]
+    game.tiles[int(r2.x)][int(r2.y)].value = score[int(random.randrange(10))]
+
+
+def     move_up():
+    for row in range(4):
+        for column in range(4):
+            if game.tiles[column][row].value != 0:
+                if row - 1 >= 0 and game.tiles[column][row].value != 0:
+                    print(f"{column}, {row - 1}")
+
 
 
 def     handle_events(events):
@@ -54,7 +65,8 @@ def     handle_events(events):
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 game.running = False
-
+            if event.key == pygame.K_z or pygame.K_UP == event.key:
+                move_up()
 
 if __name__ == '__main__':
     pygame.init()
