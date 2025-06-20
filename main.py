@@ -8,6 +8,8 @@ FPS             = 60
 
 BACKGROUND_COLOR = (255, 222, 173)
 
+
+
 class   Tile:
     def __init__(self, x, y):
         self.value = int(0)
@@ -16,11 +18,13 @@ class   Tile:
         self.text = None
 
     def draw(self, screen):
+        pygame.draw.rect(screen, BACKGROUND_COLOR, self.rect)
         pygame.draw.rect(screen, (0, 0, 255), self.rect, 16)
         self.text = font.render(f"{self.value}", True, (255, 0, 0))
         text_rect = self.text.get_rect(center=self.rect.center)
         if self.value != 0:
             screen.blit(self.text, text_rect)
+
 
 
 class   Game:
@@ -32,29 +36,29 @@ class   Game:
                 self.tiles[i][j].pos = pygame.Vector2(i, j)
 
 
-def     temp_grid(width, height):
-    for i in range(int(SCREEN_HEIGHT / height)):
-        pygame.draw.line(screen, (255, 0, 0), (width * i, 0), (width * i, SCREEN_HEIGHT), 1)
-    for i in range(int(SCREEN_WIDTH / width)):
-        pygame.draw.line(screen, (255, 0, 0), (0, height * i), (SCREEN_WIDTH, height * i), 1)
 
-def     start_game():
+def put_random_tile(game):
     random.seed()
     score = (2, 2, 2, 2, 2, 2, 2, 2, 2, 4)
     r1 = pygame.Vector2(random.randrange(4), random.randrange(4))
-    r2 = pygame.Vector2(random.randrange(4), random.randrange(4))
-    while r1 == r2:
-        r2 = pygame.Vector2(random.randrange(4), random.randrange(4))
+    while game.tiles[int(r1.x)][int(r1.y)].value != 0:
+        r1 = pygame.Vector2(random.randrange(4), random.randrange(4))
     game.tiles[int(r1.x)][int(r1.y)].value = score[int(random.randrange(10))]
-    game.tiles[int(r2.x)][int(r2.y)].value = score[int(random.randrange(10))]
 
 
-def     move_up():
+def     start_game(game):
+    for i in range(2):
+        put_random_tile(game)
+
+
+def     move_up(game):
     for row in range(4):
         for column in range(4):
             if game.tiles[column][row].value != 0:
                 if row - 1 >= 0 and game.tiles[column][row].value != 0:
                     print(f"{column}, {row - 1}")
+                    game.tiles[column][row - 1].value =  game.tiles[column][row].value
+                    game.tiles[column][row].value = 0
 
 
 
@@ -66,7 +70,7 @@ def     handle_events(events):
             if event.key == pygame.K_ESCAPE:
                 game.running = False
             if event.key == pygame.K_z or pygame.K_UP == event.key:
-                move_up()
+                move_up(game)
 
 if __name__ == '__main__':
     pygame.init()
@@ -77,7 +81,7 @@ if __name__ == '__main__':
     dt = 0
 
     game = Game()
-    start_game()
+    start_game(game)
     while game.running:
         handle_events(pygame.event.get())
 
@@ -85,8 +89,6 @@ if __name__ == '__main__':
         for i in range(4):
             for j in range(4):
                 game.tiles[i][j].draw(screen)
-
-        temp_grid(TILE_SIZE, TILE_SIZE)
 
         pygame.display.flip()
         dt = clock.tick(FPS) / 1000
