@@ -53,13 +53,35 @@ def     start_game(game):
 
 def     move_up(game):
     for row in range(4):
+        row_check = 1
         for column in range(4):
             if game.tiles[column][row].value != 0:
-                if row - 1 >= 0 and game.tiles[column][row].value != 0:
-                    print(f"{column}, {row - 1}")
-                    game.tiles[column][row - 1].value =  game.tiles[column][row].value
-                    game.tiles[column][row].value = 0
+                temp_row = row - 1
+                while temp_row >= 0 and game.tiles[column][temp_row].value == 0:
+                    game.tiles[column][temp_row].value = game.tiles[column][temp_row + 1].value
+                    game.tiles[column][temp_row + 1].value = 0
+                    temp_row -= 1
+                if row_check and game.tiles[column][temp_row + 1].value == game.tiles[column][temp_row].value:
+                    game.tiles[column][temp_row].value *= 2
+                    game.tiles[column][temp_row + 1].value = 0
+                    row_check = 0
+    put_random_tile(game)
 
+def     move_down(game):
+    for row in range(3, -1, -1):
+        row_check = 1
+        for column in range(4):
+            if game.tiles[column][row].value != 0:
+                temp_row = row + 1
+                while temp_row < 4 and game.tiles[column][temp_row].value == 0:
+                    game.tiles[column][temp_row].value = game.tiles[column][temp_row - 1].value
+                    game.tiles[column][temp_row - 1].value = 0
+                    temp_row += 1
+                if row_check and temp_row < 4 and game.tiles[column][temp_row - 1].value == game.tiles[column][temp_row].value:
+                    game.tiles[column][temp_row].value *= 2
+                    game.tiles[column][temp_row - 1].value = 0
+                    row_check = 0
+    put_random_tile(game)
 
 
 def     handle_events(events):
@@ -71,6 +93,8 @@ def     handle_events(events):
                 game.running = False
             if event.key == pygame.K_z or pygame.K_UP == event.key:
                 move_up(game)
+            if event.key == pygame.K_s or pygame.K_DOWN == event.key:
+                move_down(game)
 
 if __name__ == '__main__':
     pygame.init()
