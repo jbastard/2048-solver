@@ -1,5 +1,6 @@
 import random
 import pygame
+import event
 
 TILE_SIZE       = 200
 SCREEN_WIDTH    = 800
@@ -7,7 +8,6 @@ SCREEN_HEIGHT   = 800
 FPS             = 60
 
 BACKGROUND_COLOR = (255, 222, 173)
-
 
 
 class   Tile:
@@ -26,7 +26,6 @@ class   Tile:
             screen.blit(self.text, text_rect)
 
 
-
 class   Game:
     def __init__(self):
         self.running = True
@@ -39,11 +38,12 @@ class   Game:
 
 def put_random_tile(game):
     random.seed()
-    score = (2, 2, 2, 2, 2, 2, 2, 2, 2, 4)
-    r1 = pygame.Vector2(random.randrange(4), random.randrange(4))
-    while game.tiles[int(r1.x)][int(r1.y)].value != 0:
-        r1 = pygame.Vector2(random.randrange(4), random.randrange(4))
-    game.tiles[int(r1.x)][int(r1.y)].value = score[int(random.randrange(10))]
+    score = (2,) * 9 + (4,)
+    empty = [(x, y) for x in range(4) for y in range(4) if game.tiles[x][y].value == 0]
+    if not empty:
+        return
+    x, y = random.choice(empty)
+    game.tiles[x][y].value = random.choice(score)
 
 
 def     start_game(game):
@@ -51,55 +51,10 @@ def     start_game(game):
         put_random_tile(game)
 
 
-def     move_up(game):
-    for row in range(4):
-        row_check = 1
-        for column in range(4):
-            if game.tiles[column][row].value != 0:
-                temp_row = row - 1
-                while temp_row >= 0 and game.tiles[column][temp_row].value == 0:
-                    game.tiles[column][temp_row].value = game.tiles[column][temp_row + 1].value
-                    game.tiles[column][temp_row + 1].value = 0
-                    temp_row -= 1
-                if row_check and game.tiles[column][temp_row + 1].value == game.tiles[column][temp_row].value:
-                    game.tiles[column][temp_row].value *= 2
-                    game.tiles[column][temp_row + 1].value = 0
-                    row_check = 0
-    put_random_tile(game)
-
-def     move_down(game):
-    for row in range(3, -1, -1):
-        row_check = 1
-        for column in range(4):
-            if game.tiles[column][row].value != 0:
-                temp_row = row + 1
-                while temp_row < 4 and game.tiles[column][temp_row].value == 0:
-                    game.tiles[column][temp_row].value = game.tiles[column][temp_row - 1].value
-                    game.tiles[column][temp_row - 1].value = 0
-                    temp_row += 1
-                if row_check and temp_row < 4 and game.tiles[column][temp_row - 1].value == game.tiles[column][temp_row].value:
-                    game.tiles[column][temp_row].value *= 2
-                    game.tiles[column][temp_row - 1].value = 0
-                    row_check = 0
-    put_random_tile(game)
-
-
-def     handle_events(events):
-    for event in events:
-        if event.type == pygame.QUIT:
-            game.running = False
-        elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_ESCAPE:
-                game.running = False
-            if event.key == pygame.K_z or pygame.K_UP == event.key:
-                move_up(game)
-            if event.key == pygame.K_s or pygame.K_DOWN == event.key:
-                move_down(game)
-
 if __name__ == '__main__':
     pygame.init()
 
-    font = pygame.font.SysFont("monospace", 46)
+    font = pygame.font.SysFont("monospace", 46, bold=True)
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     clock = pygame.time.Clock()
     dt = 0
@@ -107,7 +62,7 @@ if __name__ == '__main__':
     game = Game()
     start_game(game)
     while game.running:
-        handle_events(pygame.event.get())
+        event.handle_events(game ,pygame.event.get())
 
 
         for i in range(4):
