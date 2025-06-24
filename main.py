@@ -18,7 +18,7 @@ def main():
         for event in pygame.event.get():
             game.handle_event(event)
 
-        renderer.draw_board(game.tiles)
+        renderer.draw_board(game.tiles, game.score)
         pygame.display.flip()
         clock.tick(FPS)
 

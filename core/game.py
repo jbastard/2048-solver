@@ -17,6 +17,7 @@ class Game:
                                 offset_y, 
                                 GAME_WIDTH, 
                                 GAME_HEIGHT)
+        self.score = 0
 
     def start(self):
         for _ in range(2):
@@ -31,10 +32,10 @@ class Game:
             if event.key == K_ESCAPE:
                 self.running = False
             elif event.key in (K_UP, K_z):
-                move(self.tiles, 'up')
+                move(self.tiles, 'up', self)
             elif event.key in (K_DOWN, K_s):
-                move(self.tiles, 'down')
+                move(self.tiles, 'down', self)
             elif event.key in (K_LEFT, K_q):
-                move(self.tiles, 'left')
+                move(self.tiles, 'left', self)
             elif event.key in (K_RIGHT, K_d):
-                move(self.tiles, 'right')
+                move(self.tiles, 'right', self)
