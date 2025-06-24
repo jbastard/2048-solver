@@ -1,7 +1,7 @@
 import pygame
 from core.game import Game
 from ui.renderer import Renderer
-from ui.assets import BACKGROUND_COLOR, SCREEN_WIDTH, SCREEN_HEIGHT, FPS
+from ui.assets import SCREEN_WIDTH, SCREEN_HEIGHT, FPS
 
 def main():
     pygame.init()
@@ -11,14 +11,13 @@ def main():
     font = pygame.font.SysFont("monospace", 46, bold=True)
 
     game = Game()
-    renderer = Renderer(screen, font)
+    renderer = Renderer(screen, font, game)
     game.start()
 
     while game.running:
         for event in pygame.event.get():
             game.handle_event(event)
 
-        screen.fill(BACKGROUND_COLOR)
         renderer.draw_board(game.tiles)
         pygame.display.flip()
         clock.tick(FPS)
