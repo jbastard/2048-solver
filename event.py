@@ -17,6 +17,19 @@ def     handle_events(game, events):
             if event.key == pygame.K_d or pygame.K_RIGHT== event.key:
                 move_right(game)
 
+
+def     move_tiles(game, dx, dy):
+    moved = False
+    merged = [4][4]
+    for i in range(4):
+        x, y = (i, 0 if dy == 1 else 3) if dx == 0 else (0 if dx == 1 else 3, i)
+        for row in range(x, 4, dx) if dx == 1 else range(x, -1, dx):
+            for column in range(y, 4, dy) if dy == 1 else range(y, -1, dy):
+                temp_row, temp_column = row, column
+                while game.tiles[temp_column][temp_row].value:
+
+
+
 def     move_down(game):
     moved = 0
     for row in range(3, -1, -1):
