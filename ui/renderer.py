@@ -39,7 +39,6 @@ class Renderer:
         for row in tiles:
             for tile in row:
                 color = TILE_COLORS.get(tile.value, DEFAULT_TILE_COLOR)
-                pygame.draw.rect(self.screen, MARGIN_COLOR, tile.rect, 8)
                 pygame.draw.rect(self.screen, color, tile.rect, border_radius=15)
                 pygame.draw.rect(self.screen, MARGIN_COLOR, tile.rect, 8, border_radius=15)
                 if tile.value != 0:
