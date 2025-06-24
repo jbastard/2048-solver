@@ -44,16 +44,11 @@ class   Game:
 
 def put_random_tile(game):
     random.seed()
-    # score = (2, 2, 2, 2, 2, 2, 2, 2, 2, 4)
-    # r1 = pygame.Vector2(random.randrange(4), random.randrange(4))
-    # while game.tiles[int(r1.x)][int(r1.y)].value != 0:
-    #     r1 = pygame.Vector2(random.randrange(4), random.randrange(4))
-    # game.tiles[int(r1.x)][int(r1.y)].value = score[int(random.randrange(10))]
     score = (2,) * 9 + (4,)
-    empty = [(x, y) for x in range(4) for y in range(4) if game.tiles[x][y].value == 0] # Récupère toutes les cases vides sous forme de tableau
+    empty = [(x, y) for x in range(4) for y in range(4) if game.tiles[x][y].value == 0]
     if not empty:
         return
-    x, y = random.choice(empty) # Récupère une case vide au hasard
+    x, y = random.choice(empty)
     game.tiles[x][y].value = random.choice(score)
 
 
@@ -105,39 +100,6 @@ def     move(game, direction):
 
     if moved:
         put_random_tile(game)
-
-# def     move_up(game):
-#     for row in range(4):
-#         row_check = 1
-#         for column in range(4):
-#             if game.tiles[column][row].value != 0:
-#                 temp_row = row - 1
-#                 while temp_row >= 0 and game.tiles[column][temp_row].value == 0:
-#                     game.tiles[column][temp_row].value = game.tiles[column][temp_row + 1].value
-#                     game.tiles[column][temp_row + 1].value = 0
-#                     temp_row -= 1
-#                 if row_check and game.tiles[column][temp_row + 1].value == game.tiles[column][temp_row].value:
-#                     game.tiles[column][temp_row].value *= 2
-#                     game.tiles[column][temp_row + 1].value = 0
-#                     row_check = 0
-#     put_random_tile(game)
-#
-# def     move_down(game):
-#     for row in range(3, -1, -1):
-#         row_check = 1
-#         for column in range(4):
-#             if game.tiles[column][row].value != 0:
-#                 temp_row = row + 1
-#                 while temp_row < 4 and game.tiles[column][temp_row].value == 0:
-#                     game.tiles[column][temp_row].value = game.tiles[column][temp_row - 1].value
-#                     game.tiles[column][temp_row - 1].value = 0
-#                     temp_row += 1
-#                 if row_check and temp_row < 4 and game.tiles[column][temp_row - 1].value == game.tiles[column][temp_row].value:
-#                     game.tiles[column][temp_row].value *= 2
-#                     game.tiles[column][temp_row - 1].value = 0
-#                     row_check = 0
-#     put_random_tile(game)
-
 
 def     handle_events(events):
     for event in events:
