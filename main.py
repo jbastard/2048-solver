@@ -1,3 +1,15 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    main.py                                            :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: cpoulain <cpoulain@student.42.fr>          +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2025/06/25 17:20:48 by cpoulain          #+#    #+#              #
+#    Updated: 2025/06/25 17:20:48 by cpoulain         ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
+
 import pygame
 from core.game import Game
 from ui.renderer import Renderer
@@ -12,7 +24,8 @@ def main():
     font = pygame.font.SysFont("monospace", TILE_SIZE // 4, bold=True)
 
     animator = TileAnimator()
-    game = Game(animator=animator)
+    game = Game()
+    game.set_animator(animator)
     renderer = Renderer(screen, font, game, animator)
     game.start()
 

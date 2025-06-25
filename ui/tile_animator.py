@@ -6,7 +6,7 @@
 #    By: cpoulain <cpoulain@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/06/25 16:51:49 by cpoulain          #+#    #+#              #
-#    Updated: 2025/06/25 17:09:04 by cpoulain         ###   ########.fr        #
+#    Updated: 2025/06/25 17:46:56 by cpoulain         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -25,8 +25,8 @@ class	TileAnimator:
         self.animations.append(tile)
 
     def animate_move(self, tile: Tile, from_pos, to_pos):
-        tile.screen_pos = from_pos
-        tile.target_screen_pos = to_pos
+        tile.screen_pos = pygame.Vector2(from_pos)
+        tile.target_screen_pos = pygame.Vector2(to_pos)
         tile.animating = True
         tile.animation_type = "move"
         tile.animation_start = pygame.time.get_ticks()
@@ -48,17 +48,17 @@ class	TileAnimator:
 
             match (tile.animation_type):
                 case "move":
-                    tile.rect.topleft = tile.screen_pos.lerp(pygame.Vector2(tile.target_screen_pos), t)
+                    tile.screen_pos = tile.screen_pos.lerp(tile.target_screen_pos, t)
                 case "spawn":
                     tile.scale = t if t < 1.0 else 1.0
                 case "merge":
-                    tile.scale = 1.0 + 0.2 * (1 - abs(2 * t - 1))
+                    tile.scale = 1.0 + 0.15 * (1 - (2 * t - 1)**2)
 
             if (t < 1.0):
                 still_animating.append(tile)
             else:
                 tile.animating = False
                 tile.scale = 1.0
-                tile.screen_pos = tile.rect.topleft
+                tile.screen_pos = tile.target_screen_pos
 
         self.animations = still_animating

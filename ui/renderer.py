@@ -1,4 +1,14 @@
-# renderer.py
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    renderer.py                                        :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: cpoulain <cpoulain@student.42.fr>          +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2025/06/25 17:20:33 by cpoulain          #+#    #+#              #
+#    Updated: 2025/06/25 17:40:25 by cpoulain         ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
 
 import pygame
 from ui.assets import BACKGROUND_COLOR, MARGIN_COLOR, TILE_COLORS, DEFAULT_TILE_COLOR, SCREEN_WIDTH, TILE_SIZE
@@ -48,14 +58,15 @@ class Renderer:
 
                 bg_color, fg_color = TILE_COLORS.get(tile.value, DEFAULT_TILE_COLOR)
 
-                scaled_size = TILE_SIZE * tile.scale
-                tile_rect = pygame.Rect(tile.rect.topleft, (TILE_SIZE, TILE_SIZE))
-                tile_rect.width = tile_rect.height = scaled_size
-                tile_rect.center = tile.rect.center
+                draw_pos = tile.screen_pos if tile.animating else pygame.Vector2(tile.rect.topleft)
+                tile_rect = pygame.Rect(draw_pos, (TILE_SIZE, TILE_SIZE))
+                tile_rect.width = tile_rect.height = TILE_SIZE * tile.scale
+                tile_rect.center = (draw_pos.x + TILE_SIZE // 2, draw_pos.y + TILE_SIZE // 2)
 
-                pygame.draw.rect(self.screen, bg_color, tile.rect, border_radius=15)
-                pygame.draw.rect(self.screen, MARGIN_COLOR, tile.rect, 8, border_radius=15)
+                pygame.draw.rect(self.screen, bg_color, tile_rect, border_radius=15)
+                pygame.draw.rect(self.screen, MARGIN_COLOR, tile_rect, 8, border_radius=15)
 
                 text = self.font.render(str(tile.value), True, fg_color)
-                rect = text.get_rect(center=tile.rect.center)
-                self.screen.blit(text, rect)
+                text_rect = text.get_rect(center=tile_rect.center)
+                self.screen.blit(text, text_rect)
+
