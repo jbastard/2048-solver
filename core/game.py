@@ -5,19 +5,20 @@ import pygame
 from core.logic import move, put_random_tile
 from core.tile import Tile
 from ui.assets import SCREEN_HEIGHT, SCREEN_WIDTH, GAME_HEIGHT, GAME_WIDTH
-
+from ui.tile_animator import TileAnimator
 
 class Game:
-    def __init__(self):
+    def __init__(self, animator: TileAnimator = None):
         self.running = True
         offset_x = (SCREEN_WIDTH - GAME_WIDTH) // 2
         offset_y = (SCREEN_HEIGHT - GAME_HEIGHT) - (SCREEN_WIDTH - GAME_WIDTH) // 4
         self.tiles = [[Tile(x, y, offset_x, offset_y) for y in range(4)] for x in range(4)]
         self.rect = pygame.Rect(offset_x,
-                                offset_y, 
-                                GAME_WIDTH, 
+                                offset_y,
+                                GAME_WIDTH,
                                 GAME_HEIGHT)
         self.score = 0
+        self.animator = animator
 
     def start(self):
         for _ in range(2):

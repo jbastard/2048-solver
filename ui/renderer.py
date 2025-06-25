@@ -1,18 +1,21 @@
 # renderer.py
 
 import pygame
-from ui.assets import BACKGROUND_COLOR, MARGIN_COLOR, TILE_COLORS, DEFAULT_TILE_COLOR, SCREEN_WIDTH
+from ui.assets import BACKGROUND_COLOR, MARGIN_COLOR, TILE_COLORS, DEFAULT_TILE_COLOR, SCREEN_WIDTH, TILE_SIZE
 from core.game import Game
 from core.tile import Tile
+from ui.tile_animator import TileAnimator
 from typing import List
 
 class Renderer:
-    def __init__(self, screen : pygame.Surface, font, game: Game):
+    def __init__(self, screen : pygame.Surface, font, game: Game, animator: TileAnimator):
         self.screen = screen
         self.font = font
         self.game = game
+        self.animator = animator
 
     def draw_board(self, tiles: List[List[Tile]], score: int):
+        self.animator.update_animations()
         self.screen.fill(BACKGROUND_COLOR)
 
         # Draw Title
@@ -40,10 +43,19 @@ class Renderer:
         pygame.draw.rect(self.screen, MARGIN_COLOR, self.game.rect, border_radius=20)
         for row in tiles:
             for tile in row:
+                if tile.value == 0:
+                    continue
+
                 bg_color, fg_color = TILE_COLORS.get(tile.value, DEFAULT_TILE_COLOR)
+
+                scaled_size = TILE_SIZE * tile.scale
+                tile_rect = pygame.Rect(tile.rect.topleft, (TILE_SIZE, TILE_SIZE))
+                tile_rect.width = tile_rect.height = scaled_size
+                tile_rect.center = tile.rect.center
+
                 pygame.draw.rect(self.screen, bg_color, tile.rect, border_radius=15)
                 pygame.draw.rect(self.screen, MARGIN_COLOR, tile.rect, 8, border_radius=15)
-                if tile.value != 0:
-                    text = self.font.render(str(tile.value), True, fg_color)
-                    rect = text.get_rect(center=tile.rect.center)
-                    self.screen.blit(text, rect)
+
+                text = self.font.render(str(tile.value), True, fg_color)
+                rect = text.get_rect(center=tile.rect.center)
+                self.screen.blit(text, rect)

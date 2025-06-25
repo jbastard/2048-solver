@@ -1,3 +1,5 @@
+# tile.py
+
 import pygame
 from ui.assets import TILE_SIZE
 
@@ -9,3 +11,11 @@ class Tile:
                                 offset_y + y * TILE_SIZE,
                                 TILE_SIZE,
                                 TILE_SIZE)
+        self.screen_pos = self.rect.topleft  # for animation
+        self.animating = False
+        self.animation_type = None
+        self.animation_start = 0
+        self.animation_duration = 200  # ms
+        self.target_screen_pos = self.screen_pos
+        self.scale = 1.0
+        self.just_merged = False

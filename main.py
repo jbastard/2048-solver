@@ -1,6 +1,7 @@
 import pygame
 from core.game import Game
 from ui.renderer import Renderer
+from ui.tile_animator import TileAnimator
 from ui.assets import SCREEN_WIDTH, SCREEN_HEIGHT, FPS, TILE_SIZE
 
 def main():
@@ -10,8 +11,9 @@ def main():
     clock = pygame.time.Clock()
     font = pygame.font.SysFont("monospace", TILE_SIZE // 4, bold=True)
 
-    game = Game()
-    renderer = Renderer(screen, font, game)
+    animator = TileAnimator()
+    game = Game(animator=animator)
+    renderer = Renderer(screen, font, game, animator)
     game.start()
 
     while game.running:

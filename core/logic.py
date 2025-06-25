@@ -2,13 +2,17 @@
 
 import random
 from utils.vector import DIRECTION_VECTORS
+from ui.tile_animator import TileAnimator
 
-def put_random_tile(tiles):
+def put_random_tile(tiles, animator : TileAnimator =None):
     values = (2,) * 9 + (4,)
     empty = [(x, y) for x in range(4) for y in range(4) if tiles[x][y].value == 0]
     if empty:
         x, y = random.choice(empty)
-        tiles[x][y].value = random.choice(values)
+        tile = tiles[x][y]
+        tile.value = random.choice(values)
+        if animator:
+            animator.animate_spawn(tile)
 
 def get_line(tiles, x, y, dx, dy):
     return [tiles[x + i * dx][y + i * dy] for i in range(4)]
@@ -51,6 +55,6 @@ def move(tiles, direction, game):
             moved = True
         set_line(tiles, x, y, dx, dy, merged)
     if moved:
-        put_random_tile(tiles)
+        put_random_tile(tiles, game.animator)
         game.score += total_score
         print(f"Score : {game.score}")
