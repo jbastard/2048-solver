@@ -9,95 +9,40 @@ def     handle_events(game, events):
             if event.key == pygame.K_ESCAPE:
                 game.running = False
             if event.key == pygame.K_z or pygame.K_UP == event.key:
-                move_up(game)
+                move_tiles(game, 0, -1)
             if event.key == pygame.K_s or pygame.K_DOWN == event.key:
-                move_down(game)
+                move_tiles(game, 0, 1)
             if event.key == pygame.K_q or pygame.K_LEFT == event.key:
-                move_left(game)
+                move_tiles(game, -1, 0)
             if event.key == pygame.K_d or pygame.K_RIGHT== event.key:
-                move_right(game)
+                move_tiles(game, 1, 0)
+            if event.key == pygame.K_r:
+                main.start_game(game)
 
 
 def     move_tiles(game, dx, dy):
     moved = False
-    merged = [4][4]
-    for i in range(4):
-        x, y = (i, 0 if dy == 1 else 3) if dx == 0 else (0 if dx == 1 else 3, i)
-        for row in range(x, 4, dx) if dx == 1 else range(x, -1, dx):
-            for column in range(y, 4, dy) if dy == 1 else range(y, -1, dy):
-                temp_row, temp_column = row, column
-                while game.tiles[temp_column][temp_row].value:
+    merged = [[False for _ in range(4)] for _ in range(4)]
 
+    range_x = range(4) if dx == -1 else range(3, -1, -1) if dx == 1 else range(4)
+    range_y = range(4) if dy == -1 else range(3, -1, -1) if dy == 1 else range(4)
 
-
-def     move_down(game):
-    moved = 0
-    for row in range(3, -1, -1):
-        for column in range(4):
-            if game.tiles[column][row].value != 0:
-                temp_row = row + 1
-                while temp_row < 4 and game.tiles[column][temp_row].value == 0:
-                    game.tiles[column][temp_row].value = game.tiles[column][temp_row - 1].value
-                    game.tiles[column][temp_row - 1].value = 0
-                    temp_row += 1
-                    moved = 1
-                if temp_row < 4 and game.tiles[column][temp_row - 1].value == game.tiles[column][temp_row].value:
-                    game.tiles[column][temp_row].value *= 2
-                    game.tiles[column][temp_row - 1].value = 0
-                    moved = 1
-    if moved:
-        main.put_random_tile(game)
-
-def     move_up(game):
-    moved = 0
-    for row in range(4):
-        for column in range(4):
-            if game.tiles[column][row].value != 0:
-                temp_row = row - 1
-                while temp_row >= 0 and game.tiles[column][temp_row].value == 0:
-                    game.tiles[column][temp_row].value = game.tiles[column][temp_row + 1].value
-                    game.tiles[column][temp_row + 1].value = 0
-                    temp_row -= 1
-                    moved = 1
-                if game.tiles[column][temp_row + 1].value == game.tiles[column][temp_row].value:
-                    game.tiles[column][temp_row].value *= 2
-                    game.tiles[column][temp_row + 1].value = 0
-                    moved = 1
-    if moved:
-        main.put_random_tile(game)
-
-def     move_left(game):
-    moved = 0
-    for column in range(4):
-        for row in range(4):
-            if game.tiles[column][row].value != 0:
-                temp_column = column - 1
-                while temp_column >= 0 and game.tiles[temp_column][row].value == 0:
-                    game.tiles[temp_column][row].value = game.tiles[temp_column + 1][row].value
-                    game.tiles[temp_column + 1][row].value = 0
-                    temp_column -= 1
-                    moved = 1
-                if game.tiles[temp_column + 1][row].value == game.tiles[temp_column][row].value:
-                    game.tiles[temp_column][row].value *= 2
-                    game.tiles[temp_column + 1][row].value = 0
-                    moved = 1
-    if moved:
-        main.put_random_tile(game)
-
-def move_right(game):
-    moved = 0
-    for column in range(3, -1, -1):
-        for row in range(4):
-            if game.tiles[column][row].value != 0:
-                temp_column = column + 1
-                while temp_column < 4 and game.tiles[temp_column][row].value == 0:
-                    game.tiles[temp_column][row].value = game.tiles[temp_column - 1][row].value
-                    game.tiles[temp_column - 1][row].value = 0
-                    temp_column += 1
-                    moved = 1
-                if temp_column < 4 and game.tiles[temp_column - 1][row].value == game.tiles[temp_column][row].value:
-                    game.tiles[temp_column][row].value *= 2
-                    game.tiles[temp_column - 1][row].value = 0
-                    moved = 1
+    for x in range_x:
+        for y in range_y:
+            if game.tiles[x][y].value != 0:
+                curr_x, curr_y = x, y
+                next_x, next_y = x + dx, y + dy
+                while 0 <= next_x < 4 and 0 <= next_y < 4 and game.tiles[next_x][next_y].value == 0:
+                    game.tiles[next_x][next_y].value = game.tiles[curr_x][curr_y].value
+                    game.tiles[curr_x][curr_y].value = 0
+                    curr_x, curr_y = next_x, next_y
+                    next_x, next_y = curr_x + dx, curr_y + dy
+                    moved = True
+                if 0 <= next_x < 4 and 0 <= next_y < 4 and game.tiles[next_x][next_y].value == game.tiles[curr_x][curr_y].value and not merged[next_x][next_y]:
+                    game.tiles[next_x][next_y].value *= 2
+                    game.score += game.tiles[next_x][next_y].value
+                    game.tiles[curr_x][curr_y].value = 0
+                    merged[next_x][next_y] = True
+                    moved = True
     if moved:
         main.put_random_tile(game)
