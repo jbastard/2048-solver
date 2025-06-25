@@ -1,24 +1,57 @@
-import random
 import pygame
-from constants import TILE_SIZE, SCREEN_WIDTH, SCREEN_HEIGHT, LOGO_SIZE, SCORE_SIZE, TEXT_COLOR_LIGHT, TEXT_COLOR_DARK, GRID_COLOR, BACKGROUND_COLOR, TILE_COLOR
+from constants import (
+    TILE_SIZE,
+    SCREEN_WIDTH,
+    SCREEN_HEIGHT,
+    LOGO_SIZE,
+    SCORE_SIZE,
+    TEXT_COLOR_LIGHT,
+    TEXT_COLOR_DARK,
+    GRID_COLOR,
+    BACKGROUND_COLOR,
+    TILE_COLOR,
+)
 from tile import Tile
+from game_logic import Game
 
 logo_font = None
 score_font = None
 
-game_font = None  # imported from tile module, but keep variable name for compatibility
+game_font = None  # imported from tile module, kept for compatibility
 
-class   Game:
-    def __init__(self):
-        self.score = 0
-        self.running = True
+
+class GameRenderer:
+    def __init__(self, game: Game):
+        self.game = game
         self.tiles = [[Tile(x, y) for y in range(4)] for x in range(4)]
         for i in range(4):
             for j in range(4):
                 self.tiles[i][j].pos = pygame.Vector2(i, j)
+                self.tiles[i][j].value = self.game.board[i][j]
 
         # list of temporary tiles used for movement animations
         self.anim_tiles = []
+
+    def sync_from_logic(self):
+        for i in range(4):
+            for j in range(4):
+                self.tiles[i][j].value = self.game.board[i][j]
+
+    def move(self, dx: int, dy: int):
+        operations, new_tile = self.game.move(dx, dy)
+        self.sync_from_logic()
+        for op in operations:
+            sx, sy = op["from"]
+            dx_, dy_ = op["to"]
+            val = op["value"]
+            merge = op["merge"]
+            anim = Tile(dx_, dy_, value=val)
+            anim.start_move((sx, sy), (dx_, dy_), 0.1, merge=merge)
+            self.anim_tiles.append(anim)
+            self.tiles[dx_][dy_].visible = False
+        if new_tile:
+            nx, ny = new_tile
+            self.tiles[nx][ny].start_scale(0.0, 1.0, 0.1)
 
     def update(self, dt):
         # update all tiles for scaling animations
@@ -30,7 +63,6 @@ class   Game:
         for t in self.anim_tiles[:]:
             t.update(dt)
             if not t.moving:
-                # reveal the destination tile when animation completes
                 dest = self.tiles[int(t.target_cell.x)][int(t.target_cell.y)]
                 dest.visible = True
                 if t.merge:
@@ -43,7 +75,7 @@ class   Game:
         logo_text = logo_font.render("2048", True, TEXT_COLOR_LIGHT)
         logo_rect = logo_text.get_rect(centerx=TILE_SIZE, centery=TILE_SIZE / 2)
 
-        score_text = score_font.render(f"Score: {self.score}", True, TEXT_COLOR_LIGHT)
+        score_text = score_font.render(f"Score: {self.game.score}", True, TEXT_COLOR_LIGHT)
         score_rect = score_text.get_rect(centerx=SCREEN_WIDTH * 3 / 4, centery=TILE_SIZE / 2)
 
         pygame.draw.rect(screen, TILE_COLOR[2048], logo_rect.inflate(TILE_SIZE / 4, TILE_SIZE / 8), border_radius=10)
@@ -55,46 +87,11 @@ class   Game:
             for j in range(4):
                 self.tiles[i][j].draw(screen)
 
-        # draw animated moving tiles on top
         for t in self.anim_tiles:
             t.draw(screen)
 
 
-def is_game_over(game):
-    for x in range(4):
-        for y in range(4):
-            val = game.tiles[x][y].value
-            if val == 0:
-                return False
-            for dx, dy in [(1,0), (-1,0), (0,1), (0,-1)]:
-                nx, ny = x + dx, y + dy
-                if 0 <= nx < 4 and 0 <= ny < 4:
-                    if game.tiles[nx][ny].value == val:
-                        return False
-    return True
-
-def put_random_tile(game):
-    random.seed()
-    score = (2,) * 9 + (4,)
-    empty = [(x, y) for x in range(4) for y in range(4) if game.tiles[x][y].value == 0]
-    if not empty:
-        return None
-    x, y = random.choice(empty)
-    game.tiles[x][y].value = random.choice(score)
-    # animate new tile appearance
-    game.tiles[x][y].start_scale(0.0, 1.0, 0.1)
-    return x, y
-
-def     start_game(game):
-    game.score = 0
-    for x in range(4):
-        for y in range(4):
-            game.tiles[x][y].value = 0
-    for i in range(2):
-        put_random_tile(game)
-
 def render_game_over(screen):
-
     overlay = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
     overlay.fill((238, 228, 218))
     overlay.set_alpha(230)
@@ -103,4 +100,3 @@ def render_game_over(screen):
     game_over_text = logo_font.render("Game Over!", True, TEXT_COLOR_DARK)
     text_rect = game_over_text.get_rect(center=(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2))
     screen.blit(game_over_text, text_rect)
-
