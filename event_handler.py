@@ -1,5 +1,6 @@
 import game
 import pygame
+import tile
 
 
 def     handle_events(game_obj, events):
@@ -31,6 +32,7 @@ def     move_tiles(game_obj, dx, dy):
     for x in range_x:
         for y in range_y:
             if game_obj.tiles[x][y].value != 0:
+                val = game_obj.tiles[x][y].value
                 curr_x, curr_y = x, y
                 next_x, next_y = x + dx, y + dy
                 while 0 <= next_x < 4 and 0 <= next_y < 4 and game_obj.tiles[next_x][next_y].value == 0:
@@ -39,12 +41,23 @@ def     move_tiles(game_obj, dx, dy):
                     curr_x, curr_y = next_x, next_y
                     next_x, next_y = curr_x + dx, curr_y + dy
                     moved = True
+                merge = False
                 if 0 <= next_x < 4 and 0 <= next_y < 4 and game_obj.tiles[next_x][next_y].value == game_obj.tiles[curr_x][curr_y].value and not merged[next_x][next_y]:
                     game_obj.tiles[next_x][next_y].value *= 2
                     game_obj.score += game_obj.tiles[next_x][next_y].value
                     game_obj.tiles[curr_x][curr_y].value = 0
                     merged[next_x][next_y] = True
                     moved = True
+                    merge = True
+                    dest_x, dest_y = next_x, next_y
+                else:
+                    dest_x, dest_y = curr_x, curr_y
+
+                if dest_x != x or dest_y != y:
+                    anim = tile.Tile(dest_x, dest_y, value=val)
+                    anim.start_move((x, y), (dest_x, dest_y), 0.1, merge=merge)
+                    game_obj.anim_tiles.append(anim)
+                    game_obj.tiles[dest_x][dest_y].visible = False
     if moved:
         game.put_random_tile(game_obj)
 

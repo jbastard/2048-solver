@@ -19,6 +19,7 @@ if __name__ == '__main__':
     game_module.start_game(game)
     while game.running:
         event.handle_events(game, pygame.event.get())
+        game.update(dt)
         game.render(screen)
         if game_module.is_game_over(game):
             game_module.render_game_over(screen)
