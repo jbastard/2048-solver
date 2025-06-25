@@ -73,6 +73,7 @@ class BoardManager:
         return result, score
 
     def move(self, direction, game):
+        """Move tiles in the given direction and trigger animations."""
         if direction not in DIRECTION_VECTORS:
             return
 
@@ -80,51 +81,107 @@ class BoardManager:
         moved = False
         total_score = 0
 
-        for i in range(self.size):
-            # Get line of tiles in the correct direction
-            x, y = (i, 0 if dy == 1 else 3) if dx == 0 else (0 if dx == 1 else 3, i)
-            line = self.get_line(x, y, dx, dy)
-            tiles = [tile for tile in line if tile.value != 0]
+        def move_tile(src_x, src_y, dst_x, dst_y):
+            """Helper that moves the value from src to dst and animates the dst tile."""
+            nonlocal moved
+            src_tile = self.tiles[src_x][src_y]
+            dst_tile = self.tiles[dst_x][dst_y]
 
-            new_line = []
-            skip = False
-            j = 0
+            if src_tile == dst_tile:
+                return
 
-            while j < len(tiles):
-                current = tiles[j]
-                if not skip and j + 1 < len(tiles) and tiles[j].value == tiles[j + 1].value:
-                    # Merge
-                    current.value *= 2
-                    total_score += current.value
-                    if self.animator:
-                        self.animator.animate_merge(current)
-                    skip = True
-                else:
-                    skip = False
-                new_line.append(current)
-                j += 2 if skip else 1
+            if self.animator:
+                self.animator.animate_move(dst_tile, src_tile.rect.topleft, dst_tile.rect.topleft)
 
-            # Fill with empty tiles to fit the row
-            while len(new_line) < self.size:
-                new_line.append(None)
+            dst_tile.value = src_tile.value
+            src_tile.value = 0
+            moved = True
 
-            # Animate and apply the result to self.tiles
-            for idx, new_tile in enumerate(new_line):
-                dest_x = x + idx * dx
-                dest_y = y + idx * dy
-                dest_tile = self.tiles[dest_x][dest_y]
+        if direction == 'up':
+            for x in range(self.size):
+                last_merge_y = -1
+                for y in range(1, self.size):
+                    if self.tiles[x][y].value == 0:
+                        continue
+                    ny = y
+                    while ny > 0 and self.tiles[x][ny - 1].value == 0:
+                        ny -= 1
+                    if ny > 0 and self.tiles[x][ny - 1].value == self.tiles[x][y].value and last_merge_y != ny - 1:
+                        move_tile(x, y, x, ny - 1)
+                        dst = self.tiles[x][ny - 1]
+                        dst.value *= 2
+                        dst.just_merged = True
+                        total_score += dst.value
+                        if self.animator:
+                            self.animator.animate_merge(dst)
+                        last_merge_y = ny - 1
+                    else:
+                        move_tile(x, y, x, ny)
+        elif direction == 'down':
+            for x in range(self.size):
+                last_merge_y = self.size
+                for y in range(self.size - 2, -1, -1):
+                    if self.tiles[x][y].value == 0:
+                        continue
+                    ny = y
+                    while ny + 1 < self.size and self.tiles[x][ny + 1].value == 0:
+                        ny += 1
+                    if ny + 1 < self.size and self.tiles[x][ny + 1].value == self.tiles[x][y].value and last_merge_y != ny + 1:
+                        move_tile(x, y, x, ny + 1)
+                        dst = self.tiles[x][ny + 1]
+                        dst.value *= 2
+                        dst.just_merged = True
+                        total_score += dst.value
+                        if self.animator:
+                            self.animator.animate_merge(dst)
+                        last_merge_y = ny + 1
+                    else:
+                        move_tile(x, y, x, ny)
+        elif direction == 'left':
+            for y in range(self.size):
+                last_merge_x = -1
+                for x in range(1, self.size):
+                    if self.tiles[x][y].value == 0:
+                        continue
+                    nx = x
+                    while nx > 0 and self.tiles[nx - 1][y].value == 0:
+                        nx -= 1
+                    if nx > 0 and self.tiles[nx - 1][y].value == self.tiles[x][y].value and last_merge_x != nx - 1:
+                        move_tile(x, y, nx - 1, y)
+                        dst = self.tiles[nx - 1][y]
+                        dst.value *= 2
+                        dst.just_merged = True
+                        total_score += dst.value
+                        if self.animator:
+                            self.animator.animate_merge(dst)
+                        last_merge_x = nx - 1
+                    else:
+                        move_tile(x, y, nx, y)
+        elif direction == 'right':
+            for y in range(self.size):
+                last_merge_x = self.size
+                for x in range(self.size - 2, -1, -1):
+                    if self.tiles[x][y].value == 0:
+                        continue
+                    nx = x
+                    while nx + 1 < self.size and self.tiles[nx + 1][y].value == 0:
+                        nx += 1
+                    if nx + 1 < self.size and self.tiles[nx + 1][y].value == self.tiles[x][y].value and last_merge_x != nx + 1:
+                        move_tile(x, y, nx + 1, y)
+                        dst = self.tiles[nx + 1][y]
+                        dst.value *= 2
+                        dst.just_merged = True
+                        total_score += dst.value
+                        if self.animator:
+                            self.animator.animate_merge(dst)
+                        last_merge_x = nx + 1
+                    else:
+                        move_tile(x, y, nx, y)
 
-                old_value = dest_tile.value
-                new_value = new_tile.value if new_tile else 0
-
-                if new_tile and new_tile != dest_tile and new_tile.value != 0:
-                    if self.animator:
-                        self.animator.animate_move(new_tile, new_tile.rect.topleft, dest_tile.rect.topleft)
-
-                dest_tile.value = new_value
-
-            if [tile.value for tile in line] != [t.value if t else 0 for t in new_line]:
-                moved = True
+        # reset merge flags
+        for row in self.tiles:
+            for tile in row:
+                tile.just_merged = False
 
         if moved:
             self.put_random_tile()
