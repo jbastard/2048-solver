@@ -3,6 +3,8 @@
 import pygame
 from ui.assets import BACKGROUND_COLOR, MARGIN_COLOR, TILE_COLORS, DEFAULT_TILE_COLOR, SCREEN_WIDTH
 from core.game import Game
+from core.tile import Tile
+from typing import List
 
 class Renderer:
     def __init__(self, screen : pygame.Surface, font, game: Game):
@@ -10,7 +12,7 @@ class Renderer:
         self.font = font
         self.game = game
 
-    def draw_board(self, tiles, score):
+    def draw_board(self, tiles: List[List[Tile]], score: int):
         self.screen.fill(BACKGROUND_COLOR)
 
         # Draw Title
@@ -38,10 +40,10 @@ class Renderer:
         pygame.draw.rect(self.screen, MARGIN_COLOR, self.game.rect, border_radius=20)
         for row in tiles:
             for tile in row:
-                color = TILE_COLORS.get(tile.value, DEFAULT_TILE_COLOR)
-                pygame.draw.rect(self.screen, color, tile.rect, border_radius=15)
+                bg_color, fg_color = TILE_COLORS.get(tile.value, DEFAULT_TILE_COLOR)
+                pygame.draw.rect(self.screen, bg_color, tile.rect, border_radius=15)
                 pygame.draw.rect(self.screen, MARGIN_COLOR, tile.rect, 8, border_radius=15)
                 if tile.value != 0:
-                    text = self.font.render(f"{tile.value}", True, (255, 0, 0))
+                    text = self.font.render(str(tile.value), True, fg_color)
                     rect = text.get_rect(center=tile.rect.center)
                     self.screen.blit(text, rect)
