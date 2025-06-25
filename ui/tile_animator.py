@@ -22,7 +22,8 @@ class	TileAnimator:
         tile.animating = True
         tile.animation_type = "spawn"
         tile.animation_start = pygame.time.get_ticks()
-        self.animations.append(tile)
+        if tile not in self.animations:
+            self.animations.append(tile)
 
     def animate_move(self, tile: Tile, from_pos, to_pos):
         tile.screen_pos = pygame.Vector2(from_pos)
@@ -30,13 +31,20 @@ class	TileAnimator:
         tile.animating = True
         tile.animation_type = "move"
         tile.animation_start = pygame.time.get_ticks()
-        self.animations.append(tile)
+        tile.pending_merge = False
+        if tile not in self.animations:
+            self.animations.append(tile)
 
     def animate_merge(self, tile: Tile):
+        if tile.animating and tile.animation_type == "move":
+            tile.pending_merge = True
+            return
         tile.animating = True
         tile.animation_type = "merge"
         tile.animation_start = pygame.time.get_ticks()
-        self.animations.append(tile)
+        tile.pending_merge = False
+        if tile not in self.animations:
+            self.animations.append(tile)
 
     def update_animations(self):
         current_time = pygame.time.get_ticks()
@@ -54,9 +62,15 @@ class	TileAnimator:
                 case "merge":
                     tile.scale = 1.0 + 0.15 * (1 - (2 * t - 1)**2)
 
-            if (t < 1.0):
+            if t < 1.0:
                 still_animating.append(tile)
             else:
+                if tile.animation_type == "move" and tile.pending_merge:
+                    tile.animation_type = "merge"
+                    tile.animation_start = current_time
+                    tile.pending_merge = False
+                    still_animating.append(tile)
+                    continue
                 tile.animating = False
                 tile.scale = 1.0
                 tile.screen_pos = tile.target_screen_pos
