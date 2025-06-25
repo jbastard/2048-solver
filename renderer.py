@@ -16,8 +16,7 @@ from game_logic import Game
 
 logo_font = None
 score_font = None
-
-game_font = None  # imported from tile module, kept for compatibility
+game_font = None
 
 
 class GameRenderer:
@@ -29,7 +28,6 @@ class GameRenderer:
                 self.tiles[i][j].pos = pygame.Vector2(i, j)
                 self.tiles[i][j].value = self.game.board[i][j]
 
-        # list of temporary tiles used for movement animations
         self.anim_tiles = []
 
     def sync_from_logic(self):
@@ -54,7 +52,6 @@ class GameRenderer:
             self.tiles[nx][ny].start_scale(0.0, 1.0, 0.1)
 
     def update(self, dt):
-        # update all tiles for scaling animations
         for i in range(4):
             for j in range(4):
                 self.tiles[i][j].update(dt)

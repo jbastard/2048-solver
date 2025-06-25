@@ -8,7 +8,6 @@ class Game:
         self.board = [[0 for _ in range(4)] for _ in range(4)]
 
     def reset(self):
-        """Start a new game."""
         self.score = 0
         for x in range(4):
             for y in range(4):
@@ -17,7 +16,6 @@ class Game:
             self.put_random_tile()
 
     def put_random_tile(self):
-        """Put a new tile on a random empty cell."""
         empty = [(x, y) for x in range(4) for y in range(4) if self.board[x][y] == 0]
         if not empty:
             return None

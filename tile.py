@@ -31,7 +31,7 @@ class Tile:
         self.moving = False
 
         self.scale = 1.0
-        self.start_scale = 1.0
+        self.scale_start = 1.0
         self.target_scale = 1.0
         self.scale_time = 0.0
         self.scale_elapsed = 0.0
@@ -62,7 +62,7 @@ class Tile:
 
     def start_scale(self, from_scale, to_scale, duration=0.1):
         self.scale = from_scale
-        self.start_scale = from_scale
+        self.scale_start = from_scale
         self.target_scale = to_scale
         self.scale_time = duration
         self.scale_elapsed = 0.0
@@ -85,7 +85,7 @@ class Tile:
                 t = min(self.scale_elapsed / self.scale_time, 1)
             else:
                 t = 1
-            self.scale = self.start_scale + (self.target_scale - self.start_scale) * t
+            self.scale = self.scale_start + (self.target_scale - self.scale_start) * t
             if t >= 1:
                 self.scaling = False
 
@@ -101,10 +101,7 @@ class Tile:
         )
         if self.scale != 1:
             rect = rect.inflate(TILE_SIZE * (self.scale - 1), TILE_SIZE * (self.scale - 1))
-            rect.center = (
-                self.pixel_pos.x + TILE_SIZE / 2,
-                self.pixel_pos.y + TILE_SIZE / 2,
-            )
+            rect.center = (int(self.pixel_pos.x + TILE_SIZE / 2), int(self.pixel_pos.y + TILE_SIZE / 2),)
 
         color = TILE_COLOR[self.value]
         pygame.draw.rect(screen, color, rect)
