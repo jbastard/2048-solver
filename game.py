@@ -17,6 +17,26 @@ class   Game:
             for j in range(4):
                 self.tiles[i][j].pos = pygame.Vector2(i, j)
 
+        # list of temporary tiles used for movement animations
+        self.anim_tiles = []
+
+    def update(self, dt):
+        # update all tiles for scaling animations
+        for i in range(4):
+            for j in range(4):
+                self.tiles[i][j].update(dt)
+
+        # update temporary moving tiles
+        for t in self.anim_tiles[:]:
+            t.update(dt)
+            if not t.moving:
+                # reveal the destination tile when animation completes
+                dest = self.tiles[int(t.target_cell.x)][int(t.target_cell.y)]
+                dest.visible = True
+                if t.merge:
+                    dest.start_scale(1.2, 1.0, 0.1)
+                self.anim_tiles.remove(t)
+
     def render(self, screen):
         screen.fill(BACKGROUND_COLOR)
 
@@ -34,6 +54,10 @@ class   Game:
         for i in range(4):
             for j in range(4):
                 self.tiles[i][j].draw(screen)
+
+        # draw animated moving tiles on top
+        for t in self.anim_tiles:
+            t.draw(screen)
 
 
 def is_game_over(game):
@@ -54,9 +78,12 @@ def put_random_tile(game):
     score = (2,) * 9 + (4,)
     empty = [(x, y) for x in range(4) for y in range(4) if game.tiles[x][y].value == 0]
     if not empty:
-        return
+        return None
     x, y = random.choice(empty)
     game.tiles[x][y].value = random.choice(score)
+    # animate new tile appearance
+    game.tiles[x][y].start_scale(0.0, 1.0, 0.1)
+    return x, y
 
 def     start_game(game):
     game.score = 0
