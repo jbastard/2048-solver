@@ -70,3 +70,19 @@ class Renderer:
                 text_rect = text.get_rect(center=tile_rect.center)
                 self.screen.blit(text, text_rect)
 
+        if self.game.game_over:
+            overlay = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
+            overlay.fill((0, 0, 0, 150))
+            self.screen.blit(overlay, (0, 0))
+            over_text = self.font.render("Game Over - Press R", True, (255, 255, 255))
+            over_rect = over_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
+            self.screen.blit(over_text, over_rect)
+
+        if self.game.confirm_restart:
+            overlay = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
+            overlay.fill((0, 0, 0, 150))
+            self.screen.blit(overlay, (0, 0))
+            prompt = self.font.render("Restart? Y/N", True, (255, 255, 255))
+            prompt_rect = prompt.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
+            self.screen.blit(prompt, prompt_rect)
+

@@ -22,6 +22,25 @@ class BoardManager:
         self.animator = animator
         self.size = len(tiles)
 
+    def moves_available(self) -> bool:
+        """Return True if at least one move is possible."""
+        # Empty space available
+        for x in range(self.size):
+            for y in range(self.size):
+                if self.tiles[x][y].value == 0:
+                    return True
+
+        # Check for possible merges horizontally and vertically
+        for x in range(self.size):
+            for y in range(self.size):
+                val = self.tiles[x][y].value
+                if x + 1 < self.size and self.tiles[x + 1][y].value == val:
+                    return True
+                if y + 1 < self.size and self.tiles[x][y + 1].value == val:
+                    return True
+
+        return False
+
     def put_random_tile(self):
         values = (2,) * 9 + (4,)
         empty = [(x, y) for x in range(self.size) for y in range(self.size)
@@ -75,7 +94,7 @@ class BoardManager:
     def move(self, direction, game):
         """Move tiles in the given direction and trigger animations."""
         if direction not in DIRECTION_VECTORS:
-            return
+            return False
 
         dx, dy = DIRECTION_VECTORS[direction]
         moved = False
@@ -187,4 +206,4 @@ class BoardManager:
             self.put_random_tile()
             game.score += total_score
             print(f"Score : {game.score}")
-
+        return moved

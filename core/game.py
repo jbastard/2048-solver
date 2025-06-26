@@ -20,6 +20,8 @@ from core.board_manager import BoardManager
 class Game:
     def __init__(self):
         self.running = True
+        self.game_over = False
+        self.confirm_restart = False
         offset_x = (SCREEN_WIDTH - GAME_WIDTH) // 2
         offset_y = (SCREEN_HEIGHT - GAME_HEIGHT) - (SCREEN_WIDTH - GAME_WIDTH) // 4
         self.tiles = [[Tile(x, y, offset_x, offset_y) for y in range(4)] for x in range(4)]
@@ -39,14 +41,40 @@ class Game:
         for _ in range(2):
             self.board.put_random_tile()
 
+    def restart(self):
+        for row in self.tiles:
+            for tile in row:
+                tile.value = 0
+                tile.animating = False
+                tile.pending_merge = False
+                tile.just_merged = False
+                tile.screen_pos = pygame.Vector2(tile.rect.topleft)
+                tile.target_screen_pos = tile.screen_pos
+                tile.scale = 1.0
+        self.score = 0
+        self.game_over = False
+        self.confirm_restart = False
+        for _ in range(2):
+            self.board.put_random_tile()
+
     def handle_event(self, event):
-        from pygame import QUIT, KEYDOWN, K_ESCAPE, K_UP, K_DOWN, K_LEFT, K_RIGHT, K_z, K_s, K_q, K_d
+        from pygame import QUIT, KEYDOWN, K_ESCAPE, K_UP, K_DOWN, K_LEFT, K_RIGHT, K_z, K_s, K_q, K_d, K_r, K_y, K_n
+
+        if self.confirm_restart:
+            if event.type == KEYDOWN:
+                if event.key == K_y:
+                    self.restart()
+                if event.key in (K_n, K_ESCAPE):
+                    self.confirm_restart = False
+            return
 
         if event.type == QUIT:
             self.running = False
         elif event.type == KEYDOWN:
             if event.key == K_ESCAPE:
                 self.running = False
+            elif event.key == K_r:
+                self.confirm_restart = True
             elif event.key in (K_UP, K_z):
                 self.board.move('up', self)
             elif event.key in (K_DOWN, K_s):
@@ -55,3 +83,9 @@ class Game:
                 self.board.move('left', self)
             elif event.key in (K_RIGHT, K_d):
                 self.board.move('right', self)
+
+            if event.key in (K_UP, K_DOWN, K_LEFT, K_RIGHT, K_z, K_s, K_q, K_d):
+                if not self.board.moves_available():
+                    if not self.game_over:
+                        print("game over")
+                    self.game_over = True
