@@ -29,3 +29,4 @@ class Tile:
         self.target_screen_pos = self.screen_pos
         self.scale = 1.0
         self.just_merged = False
+        self.pending_merge = False
