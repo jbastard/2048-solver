@@ -6,12 +6,12 @@
 #    By: cpoulain <cpoulain@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/06/25 17:20:33 by cpoulain          #+#    #+#              #
-#    Updated: 2025/06/25 17:40:25 by cpoulain         ###   ########.fr        #
+#    Updated: 2025/06/26 11:17:53 by cpoulain         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 import pygame
-from ui.assets import BACKGROUND_COLOR, MARGIN_COLOR, TILE_COLORS, DEFAULT_TILE_COLOR, SCREEN_WIDTH, TILE_SIZE
+from ui.assets import BACKGROUND_COLOR, MARGIN_COLOR, TILE_COLORS, DEFAULT_TILE_COLOR, SCREEN_WIDTH, SCREEN_HEIGHT, TILE_SIZE
 from core.game import Game
 from core.tile import Tile
 from ui.tile_animator import TileAnimator
@@ -74,15 +74,18 @@ class Renderer:
             overlay = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
             overlay.fill((0, 0, 0, 150))
             self.screen.blit(overlay, (0, 0))
-            over_text = self.font.render("Game Over - Press R", True, (255, 255, 255))
+            over_text = self.font.render("Game Over", True, (255, 255, 255))
             over_rect = over_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
+            hint_text = self.font.render("Press R to restart", True, (255, 255, 255))
+            hint_rect = hint_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 50))
             self.screen.blit(over_text, over_rect)
+            self.screen.blit(hint_text, hint_rect)
 
         if self.game.confirm_restart:
             overlay = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
             overlay.fill((0, 0, 0, 150))
             self.screen.blit(overlay, (0, 0))
             prompt = self.font.render("Restart? Y/N", True, (255, 255, 255))
-            prompt_rect = prompt.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
+            prompt_rect = prompt.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + (100 if self.game.game_over else 0)))
             self.screen.blit(prompt, prompt_rect)
 
