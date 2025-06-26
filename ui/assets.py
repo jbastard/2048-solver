@@ -6,7 +6,7 @@
 #    By: cpoulain <cpoulain@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/06/25 17:20:26 by cpoulain          #+#    #+#              #
-#    Updated: 2025/06/26 11:21:09 by cpoulain         ###   ########.fr        #
+#    Updated: 2025/06/26 11:29:11 by cpoulain         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -19,7 +19,7 @@ FPS = 60
 BACKGROUND_COLOR = (255, 245, 203)
 GAME_BACKGROUND_COLOR = (255, 222, 173)
 MARGIN_COLOR = (235, 202, 153)
-SCORE_BOX_COLOR = (132, 135, 140)
+SCORE_BOX_COLOR = (152, 155, 170)
 
 TEXT_COLOR_LIGHT = (249, 246, 242)
 TEXT_COLOR_DARK = (119, 110, 101)
