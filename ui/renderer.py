@@ -53,9 +53,6 @@ class Renderer:
         pygame.draw.rect(self.screen, MARGIN_COLOR, self.game.rect, border_radius=20)
         for row in tiles:
             for tile in row:
-                if tile.value == 0:
-                    continue
-
                 bg_color, fg_color = TILE_COLORS.get(tile.value, DEFAULT_TILE_COLOR)
 
                 draw_pos = tile.screen_pos if tile.animating else pygame.Vector2(tile.rect.topleft)
@@ -66,9 +63,10 @@ class Renderer:
                 pygame.draw.rect(self.screen, bg_color, tile_rect, border_radius=15)
                 pygame.draw.rect(self.screen, MARGIN_COLOR, tile_rect, 8, border_radius=15)
 
-                text = self.font.render(str(tile.value), True, fg_color)
-                text_rect = text.get_rect(center=tile_rect.center)
-                self.screen.blit(text, text_rect)
+                if tile.value != 0:
+                    text = self.font.render(str(tile.value), True, fg_color)
+                    text_rect = text.get_rect(center=tile_rect.center)
+                    self.screen.blit(text, text_rect)
 
         if self.game.game_over:
             overlay = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
