@@ -6,12 +6,12 @@
 #    By: cpoulain <cpoulain@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/06/25 17:20:33 by cpoulain          #+#    #+#              #
-#    Updated: 2025/06/26 11:17:53 by cpoulain         ###   ########.fr        #
+#    Updated: 2025/06/26 11:21:23 by cpoulain         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 import pygame
-from ui.assets import BACKGROUND_COLOR, MARGIN_COLOR, TILE_COLORS, DEFAULT_TILE_COLOR, SCREEN_WIDTH, SCREEN_HEIGHT, TILE_SIZE
+from ui.assets import BACKGROUND_COLOR, MARGIN_COLOR, TILE_COLORS, DEFAULT_TILE_COLOR, SCREEN_WIDTH, SCREEN_HEIGHT, TILE_SIZE, SCORE_BOX_COLOR
 from core.game import Game
 from core.tile import Tile
 from ui.tile_animator import TileAnimator
@@ -39,7 +39,7 @@ class Renderer:
         box_x = self.game.rect.right - box_width
         box_y = self.game.rect.top - box_height - 20
         box_rect = pygame.Rect(box_x, box_y, box_width, box_height)
-        pygame.draw.rect(self.screen, MARGIN_COLOR, box_rect, border_radius=12)
+        pygame.draw.rect(self.screen, SCORE_BOX_COLOR, box_rect, border_radius=12)
 
         score_label = self.font.render("Score", True, (255, 255, 255))
         score_label_rect = score_label.get_rect(center=(box_rect.centerx, box_rect.top + 25))
